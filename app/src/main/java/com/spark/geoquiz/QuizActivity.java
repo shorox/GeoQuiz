@@ -12,10 +12,13 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class QuizActivity extends AppCompatActivity {
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
     private static final int REQUEST_CODE_CHEAT = 0;
+    private static final String KEY_CHEATED_QUESTIONS = "cheated_questions";
 
     private Button mTrueButton;
     private Button mFalseButton;
@@ -34,6 +37,12 @@ public class QuizActivity extends AppCompatActivity {
     private int mCurrentIndex = 0;
     private boolean mIsCheater;
 
+    private ArrayList<Integer> mCheatedQuestions = new ArrayList<>();
+
+    private boolean isCheater() {
+        return mCheatedQuestions.contains(mCurrentIndex);
+    }
+
     private void updateQuestion(){
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
@@ -44,7 +53,7 @@ public class QuizActivity extends AppCompatActivity {
 
         int messageResId = 0;
 
-        if(mIsCheater){
+        if(mIsCheater || isCheater()){
             messageResId = R.string.judgment_toast;
         }else {
             if (userPressedTrue == answerIsTrue) {
@@ -103,6 +112,7 @@ public class QuizActivity extends AppCompatActivity {
 
         if(savedInstanceState != null){
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            mCheatedQuestions = savedInstanceState.getIntegerArrayList(KEY_CHEATED_QUESTIONS);
         }
 
         updateQuestion();
@@ -118,6 +128,9 @@ public class QuizActivity extends AppCompatActivity {
                 return;
             }
             mIsCheater = CheatActivity.wasAnswerShown(data);
+            if (mIsCheater && ! isCheater()) {
+                mCheatedQuestions.add(mCurrentIndex);
+            }
         }
     }
 
@@ -126,6 +139,7 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+        savedInstanceState.putIntegerArrayList(KEY_CHEATED_QUESTIONS, mCheatedQuestions);
     }
 
     @Override

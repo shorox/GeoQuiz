@@ -11,6 +11,7 @@ import android.widget.TextView;
 public class CheatActivity extends AppCompatActivity {
     private static final String EXTRA_ANSWER_IS_TRUE = "com.spark.geoquiz.answer_is_true";
     private static final String EXTRA_ANSWER_SHOWN = "com.spark.geoquiz.answer_show";
+    private static final String KEY_CHEAT = "cheat";
     private boolean mAnswerIsTrue;
 
     private TextView mAnswerTextView;
@@ -47,6 +48,22 @@ public class CheatActivity extends AppCompatActivity {
                 setAnswetShownResult(true);
             }
         });
+
+        if(savedInstanceState != null){
+            mAnswerIsTrue = savedInstanceState.getBoolean(KEY_CHEAT, false);
+            if (mAnswerIsTrue) {
+                mAnswerTextView.setText(R.string.true_button);
+            } else {
+                mAnswerTextView.setText(R.string.false_button);
+            }
+            setAnswetShownResult(true);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        savedInstanceState.putBoolean(KEY_CHEAT, mAnswerIsTrue);
     }
 
     private void setAnswetShownResult(boolean isAnswerShown) {
